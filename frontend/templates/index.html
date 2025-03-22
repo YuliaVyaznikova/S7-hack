@@ -291,13 +291,10 @@
                                     
                                     // Вычисляем позицию для текста
                                     const angle = element.startAngle + (element.endAngle - element.startAngle) / 2;
-                                    const radius = element.outerRadius * 0.6; // Уменьшаем радиус для предотвращения наложения
+                                    const radius = element.outerRadius * 0.65; // Единый радиус для всех сегментов
                                     
-                                    // Смещаем текст ближе к центру для маленьких сегментов
-                                    const adjustedRadius = data < total * 0.05 ? radius * 0.7 : radius;
-                                    
-                                    const x = centerX + Math.cos(angle) * adjustedRadius;
-                                    const y = centerY + Math.sin(angle) * adjustedRadius;
+                                    const x = centerX + Math.cos(angle) * radius;
+                                    const y = centerY + Math.sin(angle) * radius;
                                     
                                     // Настройка стиля текста
                                     ctx.font = 'bold 14px Arial';
