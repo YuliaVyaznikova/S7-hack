@@ -61,19 +61,48 @@
             margin: 0;
         }
         
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
         .chart-container {
             background: white;
             padding: 20px;
-            margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-left: 5px solid var(--s7-green);
+            height: 400px;
+            display: flex;
+            flex-direction: column;
         }
-        
+
+        .chart-container h2 {
+            color: var(--s7-gray);
+            font-size: 18px;
+            margin: 0 0 15px 0;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+
         canvas {
-            max-width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100% !important;
+            height: 100% !important;
         }
-        
+
         #error {
             color: #d32f2f;
             background: #fde7e7;
@@ -81,6 +110,16 @@
             border-radius: 4px;
             margin-bottom: 20px;
             display: none;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 350px;
+            }
         }
     </style>
 </head>
@@ -95,19 +134,27 @@
 
     <div id="error"></div>
     
-    <div class="chart-container">
-        <h2>Распределение отзывов по категориям</h2>
-        <canvas id="barChart"></canvas>
-    </div>
-    
-    <div class="chart-container">
-        <h2>Процентное соотношение категорий</h2>
-        <canvas id="pieChart"></canvas>
-    </div>
-    
-    <div class="chart-container">
-        <h2>Распределение оценок по категориям</h2>
-        <canvas id="stackedBarChart"></canvas>
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h2>Распределение отзывов по категориям</h2>
+            <div class="chart-wrapper">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h2>Процентное соотношение категорий</h2>
+            <div class="chart-wrapper">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h2>Распределение оценок по категориям</h2>
+            <div class="chart-wrapper">
+                <canvas id="stackedBarChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <script>
