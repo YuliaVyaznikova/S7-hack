@@ -227,6 +227,57 @@
                 const colors = generateColors(categories.length);
                 const total = counts.reduce((a, b) => a + b, 0);
 
+                // Pie Chart
+                new Chart(document.getElementById('pieChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 15,
+                                    color: 'rgb(88, 89, 91)',
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: 'rgb(88, 89, 91)',
+                                bodyColor: 'rgb(88, 89, 91)',
+                                borderColor: 'rgb(88, 89, 91)',
+                                borderWidth: 1,
+                                padding: 10,
+                                bodyFont: {
+                                    size: 14
+                                },
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return ` ${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
                 // Bar Chart
                 new Chart(document.getElementById('barChart'), {
                     type: 'bar',
@@ -240,6 +291,7 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -247,7 +299,10 @@
                                     color: 'rgba(148, 201, 72, 0.1)'
                                 },
                                 ticks: {
-                                    color: 'rgb(88, 89, 91)'
+                                    color: 'rgb(88, 89, 91)',
+                                    font: {
+                                        size: 12
+                                    }
                                 }
                             },
                             x: {
@@ -255,84 +310,39 @@
                                     display: false
                                 },
                                 ticks: {
-                                    color: 'rgb(88, 89, 91)'
+                                    color: 'rgb(88, 89, 91)',
+                                    font: {
+                                        size: 12
+                                    }
                                 }
                             }
                         },
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: 'rgb(88, 89, 91)'
+                                    color: 'rgb(88, 89, 91)',
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: 'rgb(88, 89, 91)',
+                                bodyColor: 'rgb(88, 89, 91)',
+                                borderColor: 'rgb(88, 89, 91)',
+                                borderWidth: 1,
+                                padding: 10,
+                                bodyFont: {
+                                    size: 14
+                                },
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
                                 }
                             }
                         }
                     }
-                });
-
-                // Pie Chart
-                new Chart(document.getElementById('pieChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: categories,
-                        datasets: [{
-                            data: counts,
-                            backgroundColor: colors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    boxWidth: 15,
-                                    color: 'rgb(88, 89, 91)'
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.raw;
-                                        const percentage = ((value / total) * 100).toFixed(1);
-                                        return `${context.label}: ${value} (${percentage}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    plugins: [{
-                        afterDraw: function(chart) {
-                            const ctx = chart.ctx;
-                            ctx.save();
-                            const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
-                            const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
-                            
-                            chart.data.datasets.forEach((dataset, i) => {
-                                const meta = chart.getDatasetMeta(i);
-                                meta.data.forEach((element, index) => {
-                                    const data = dataset.data[index];
-                                    const percentage = ((data / total) * 100).toFixed(1) + '%';
-                                    
-                                    const angle = element.startAngle + (element.endAngle - element.startAngle) / 2;
-                                    const radius = element.outerRadius * 0.8;
-                                    
-                                    const x = centerX + Math.cos(angle) * radius;
-                                    const y = centerY + Math.sin(angle) * radius;
-                                    
-                                    ctx.font = 'bold 13px Arial';
-                                    ctx.fillStyle = 'white';
-                                    ctx.textAlign = 'center';
-                                    ctx.textBaseline = 'middle';
-                                    
-                                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-                                    ctx.lineWidth = 4;
-                                    ctx.strokeText(percentage, x, y);
-                                    ctx.fillText(percentage, x, y);
-                                });
-                            });
-                            ctx.restore();
-                        }
-                    }]
                 });
 
                 if (data.heatmap && data.heatmap.length > 0) {
@@ -364,6 +374,7 @@
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             scales: {
                                 x: {
                                     stacked: true,
@@ -371,7 +382,10 @@
                                         display: false
                                     },
                                     ticks: {
-                                        color: 'rgb(88, 89, 91)'
+                                        color: 'rgb(88, 89, 91)',
+                                        font: {
+                                            size: 12
+                                        }
                                     }
                                 },
                                 y: {
@@ -385,17 +399,36 @@
                                         callback: function(value) {
                                             return (value * 100) + '%';
                                         },
-                                        color: 'rgb(88, 89, 91)'
+                                        color: 'rgb(88, 89, 91)',
+                                        font: {
+                                            size: 12
+                                        }
                                     }
                                 }
                             },
                             plugins: {
                                 legend: {
                                     labels: {
-                                        color: 'rgb(88, 89, 91)'
+                                        color: 'rgb(88, 89, 91)',
+                                        font: {
+                                            size: 12
+                                        }
                                     }
                                 },
                                 tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    titleColor: 'rgb(88, 89, 91)',
+                                    bodyColor: 'rgb(88, 89, 91)',
+                                    borderColor: 'rgb(88, 89, 91)',
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    bodyFont: {
+                                        size: 14
+                                    },
+                                    titleFont: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
                                     callbacks: {
                                         label: function(context) {
                                             const value = context.raw;
