@@ -1,9 +1,34 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import check_password_hash
 import ast
 from collections import Counter
 import os
+import sys
+
+# Добавляем родительскую директорию в путь для импорта users.py
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from users import USERS
 
 app = Flask(__name__)
+app.secret_key = 'your-secret-key-replace-in-production'  # Замените на реальный секретный ключ в продакшене
+
+# Настройка Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Пожалуйста, войдите для доступа к этой странице.'
+
+class User(UserMixin):
+    def __init__(self, email, name):
+        self.id = email
+        self.name = name
+
+@login_manager.user_loader
+def load_user(email):
+    if email not in USERS:
+        return None
+    return User(email, USERS[email]['name'])
 
 def get_data_path():
     base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -54,7 +79,29 @@ def calculate_heatmap(data):
     
     return result
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if email in USERS and check_password_hash(USERS[email]['password'], password):
+            user = User(email, USERS[email]['name'])
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error='Неверный email или пароль')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/api/data')
+@login_required
 def get_data():
     try:
         data = load_data()
@@ -82,8 +129,9 @@ def get_data():
         }), 500
 
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', user=current_user)
 
 if __name__ == '__main__':
     app.run(debug=True)
