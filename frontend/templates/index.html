@@ -275,7 +275,46 @@
                                 }
                             }
                         }
-                    }
+                    },
+                    plugins: [{
+                        afterDraw: function(chart) {
+                            const ctx = chart.ctx;
+                            ctx.save();
+                            const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                            const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+
+                            chart.data.datasets.forEach((dataset, i) => {
+                                const meta = chart.getDatasetMeta(i);
+                                meta.data.forEach((element, index) => {
+                                    const data = dataset.data[index];
+                                    const percentage = ((data / total) * 100).toFixed(1) + '%';
+                                    
+                                    // Вычисляем позицию для текста
+                                    const angle = element.startAngle + (element.endAngle - element.startAngle) / 2;
+                                    const radius = element.outerRadius * 0.6; // Уменьшаем радиус для предотвращения наложения
+                                    
+                                    // Смещаем текст ближе к центру для маленьких сегментов
+                                    const adjustedRadius = data < total * 0.05 ? radius * 0.7 : radius;
+                                    
+                                    const x = centerX + Math.cos(angle) * adjustedRadius;
+                                    const y = centerY + Math.sin(angle) * adjustedRadius;
+                                    
+                                    // Настройка стиля текста
+                                    ctx.font = 'bold 14px Arial';
+                                    ctx.fillStyle = 'white';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    
+                                    // Добавляем обводку для лучшей читаемости
+                                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                                    ctx.lineWidth = 3;
+                                    ctx.strokeText(percentage, x, y);
+                                    ctx.fillText(percentage, x, y);
+                                });
+                            });
+                            ctx.restore();
+                        }
+                    }]
                 });
 
                 // Bar Chart
